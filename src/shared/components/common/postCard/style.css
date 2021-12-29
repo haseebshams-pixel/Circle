@@ -1,0 +1,29 @@
+.card-container {
+  padding-bottom: 30px;
+}
+.card-main-container {
+  width: 50rem;
+}
+.carosal {
+  height: 400px;
+  background-color: lightgray;
+  margin-bottom: 16px;
+  align-items: center;
+}
+.carosal-image {
+  height: 400px;
+  object-fit: contain;
+  width: 100%;
+}
+
+@media screen and (max-width: 991px) {
+  .card-main-container {
+    width: 40rem;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .card-main-container {
+    width: 30rem;
+  }
+}

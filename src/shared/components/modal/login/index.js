@@ -29,6 +29,7 @@ function LoginModal({ openModal, HideModal }) {
           let resp = {
             isLoggedIn: true,
             token: res.data.token,
+            user: res.data.user,
           };
           setSubmitting(false);
           dispatch(setUser(resp));
@@ -40,7 +41,7 @@ function LoginModal({ openModal, HideModal }) {
       .catch((error) => {
         console.log(error);
         setSubmitting(false);
-        toastMessage("Incorrect User Credentials", "error");
+        toastMessage("User not Found", "error");
       });
   };
   return (

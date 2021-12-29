@@ -119,7 +119,7 @@ function SignupModal({ openModal, HideModal, address }) {
             <p className="input-value">DOB</p>
             <DatePicker
               selected={dob}
-              onChange={(date) => setDOB(date)}
+              onChange={(date) => setDOB(date.toDateString())}
               className="input-holder"
             />
           </div>
