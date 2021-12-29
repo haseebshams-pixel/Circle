@@ -1,0 +1,63 @@
+.login-modal-body {
+  padding: 60px 10px 30px 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-heading {
+  font-size: 30px;
+  margin-bottom: 0;
+  font-family: "Josefin Sans", sans-serif;
+  font-weight: 400;
+}
+
+.connect-login-btn {
+  min-width: 150px;
+  height: 40px;
+  border: none;
+  background-color: #0c8ed3;
+  color: #e8e8e8;
+  font-size: 14px;
+  margin-top: 30px;
+}
+.login-container {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 0px 0px 0px;
+}
+
+.rowdirection {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  padding-top: 20px;
+}
+.input-holder {
+  color: gray !important;
+  width: 100%;
+  flex: 2;
+  padding: 5px;
+}
+.input-text {
+  margin: 0;
+  align-self: center;
+  flex: 1;
+}
+
+.login-link {
+  margin-top: 15px;
+  font-size: 12px;
+  cursor: pointer;
+}
+button.close.custom-modal-close {
+  position: absolute;
+  right: 15px;
+  top: 10px;
+  color: #0c8ed3;
+  font-weight: 700;
+  opacity: 1;
+  cursor: pointer;
+  z-index: 2;
+}
