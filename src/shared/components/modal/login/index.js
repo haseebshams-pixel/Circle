@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { Modal, Spinner } from "react-bootstrap";
+import { Modal, Spinner, Button } from "react-bootstrap";
 import axios from "axios";
 import { setUser } from "../../../redux/reducers/userSlice";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
+import Form from "react-bootstrap/Form";
+
 import "./style.css";
 import "react-toastify/dist/ReactToastify.css";
 import { toastMessage } from "../../../components/common/toast";
@@ -26,6 +28,7 @@ function LoginModal({ openModal, HideModal }) {
       .then((res) => {
         if (res.statusText === "OK") {
           localStorage.setItem("token", res.data.token);
+          console.log(res.data.user);
           let resp = {
             isLoggedIn: true,
             token: res.data.token,
@@ -60,32 +63,33 @@ function LoginModal({ openModal, HideModal }) {
         <span aria-hidden="true">&times;</span>
       </button>
       <div className="login-modal-body">
-        <p className="login-heading">Welcome!</p>
-        <div className="login-container">
-          <div className="rowdirection">
-            <p className="input-text">Email</p>
-            <input
+        <p className="login-heading pb-1">Welcome!</p>
+        <Form>
+          <Form.Group className="mb-3" controlId="formBasicEmail">
+            <Form.Label className="text-font-family">Email address</Form.Label>
+            <Form.Control
               type="email"
-              placeholder="email*"
-              className="input-holder"
+              placeholder="Enter email"
               value={email}
+              className="text-font-family"
               onChange={(e) => setEmail(e.target.value)}
-              required
             />
-          </div>
-          <div className="rowdirection">
-            <p className="input-text">Password</p>
-            <input
-              type="password"
-              placeholder="password*"
-              className="input-holder"
-              password={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-        </div>
+            <Form.Text className="text-muted text-font-family">
+              We'll never share your email with anyone else.
+            </Form.Text>
+          </Form.Group>
 
+          <Form.Group className="mb-3" controlId="formBasicPassword">
+            <Form.Label className="text-font-family">Password</Form.Label>
+            <Form.Control
+              type="password"
+              placeholder="Password"
+              password={password}
+              className="text-font-family"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </Form.Group>
+        </Form>
         <button
           className="connect-login-btn"
           disabled={isSubmitting}

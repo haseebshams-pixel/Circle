@@ -33,6 +33,11 @@ const SideNav = ({ offCanvas, closeSideNav, user }) => {
         <div class="offcanvas-body">
           <div class="justify-content-end flex-grow-1 pe-3 navbar-nav">
             <ul>
+              <li>
+                <Link to="/" onClick={closeSideNav}>
+                  Home
+                </Link>
+              </li>
               {user?.isLoggedIn && (
                 <>
                   <li>
@@ -40,11 +45,20 @@ const SideNav = ({ offCanvas, closeSideNav, user }) => {
                       Create Post
                     </Link>
                   </li>
+                  <li>
+                    <Link
+                      to={`/Profile/${user.user.id}`}
+                      style={{ textDecoration: "none", color: "black" }}
+                      onClick={closeSideNav}
+                    >
+                      Profile
+                    </Link>
+                  </li>
                 </>
               )}
               <li>
-                <Link to="/" onClick={closeSideNav}>
-                  Home
+                <Link to="/search" onClick={closeSideNav}>
+                  Search
                 </Link>
               </li>
             </ul>

@@ -1,64 +1,141 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-
+import Tabs from "react-bootstrap/Tabs";
+import Tab from "react-bootstrap/Tab";
+import axios from "axios";
+import { setUser } from "../../shared/redux/reducers/userSlice";
+import { useDispatch } from "react-redux";
 import "./style.css";
-function Profile() {
+import { ProfilePlaceHolder, Pic1, Pic2, Pic3 } from "../../assets";
+import PostCard from "../../shared/components/common/postCard";
+import FriendsCard from "../../shared/components/common/friendsCard";
+import EditProfileModal from "../../shared/components/modal/editProfile";
+import { toastMessage } from "../../shared/components/common/toast";
+import avatarBaseUrl from "../../shared/utilities/avatarBaseUrl";
+
+const data = {
+  id: "61cc4451258f3045560e54e7",
+  text: "Hello name is salman, add me !",
+  images: [{ imageURL: Pic1 }, { imageURL: Pic2 }, { imageURL: Pic3 }],
+  postedBy: "61cddf0fe7fc0a90ffdb7de5",
+  date: "2021-12-29",
+  _v: 0,
+};
+
+function Profile(props) {
+  const dispatch = useDispatch();
   const user = useSelector((state) => state.root.user);
+  const [isOpen, setOpen] = useState(false);
+  const openModal = () => setOpen(true);
+  const closeModal = () => setOpen(false);
   const name = user.user.firstname + " " + user.user.lastname;
+  useEffect(() => {
+    axios
+      .get(`users/${props.match.params.id}`)
+      .then((res) => {
+        if (res.statusText === "OK") {
+          let obj = {
+            ...user,
+          };
+          obj.user = user.user;
+          dispatch(setUser(obj));
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
   return (
-    <div className="container">
-      <h3>Profile</h3>
-      <div class="py-5 px-4">
-        <div class="">
-          <div class="bg-white shadow rounded overflow-hidden">
+    <>
+      <div className="container" data-aos="fade-up" data-aos-duration="500">
+        <div class="py-5 px-4">
+          <div class="bg-white rounded overflow-hidden">
             <div class="px-4 pt-0 pb-4 cover">
               <div class="media align-items-end profile-head">
                 <div class="profile mr-3">
                   <img
-                    src="https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80"
-                    alt="..."
+                    src={
+                      user?.user?.avatar
+                        ? `${avatarBaseUrl}${user.user.avatar}`
+                        : ProfilePlaceHolder
+                    }
+                    alt="profilePic"
                     width="130"
-                    class="rounded mb-2 img-thumbnail"
+                    class="rounded mb-2 img-thumbnail main-profile-pic"
                   />
-                  <a href="#" class="btn btn-outline-dark btn-sm btn-block">
+                  <a
+                    role="button"
+                    class="btn btn-outline-dark btn-sm btn-block text-font-family"
+                    onClick={openModal}
+                  >
                     Edit profile
                   </a>
                 </div>
                 <div class="media-body mb-5 text-white">
-                  <h4 class="mt-0 mb-0">{name}</h4>
-                  <p class="small mb-4">
-                    {" "}
-                    <i class="fas fa-map-marker-alt mr-2"></i>
-                  </p>
+                  <h4 class="mt-0 mb-4 text-font-family">{name}</h4>
                 </div>
               </div>
             </div>
             <div class="bg-light p-4 d-flex justify-content-end text-center">
               <ul class="list-inline mb-0">
                 <li class="list-inline-item">
-                  <h5 class="font-weight-bold mb-0 d-block">215</h5>
+                  <h5 class="font-weight-bold mb-0 d-block text-font-family">
+                    215
+                  </h5>
                   <small class="text-muted">
                     {" "}
-                    <i class="fas fa-image mr-1"></i>Friends
+                    <i class="fas fa-image mr-1 text-font-family"></i>Friends
                   </small>
                 </li>
               </ul>
             </div>
             <div class="px-4 py-3">
-              <h5 class="mb-0">Bio</h5>
+              <h5 class="mb-0 text-font-family">Bio</h5>
               <div class="p-4 rounded shadow-sm bg-light">
-                <p class="font-italic mb-0">Web Developer</p>
+                <p class="font-italic mb-0 text-font-family">{user.user.bio}</p>
               </div>
             </div>
-            <div class="py-4 px-4">
-              <div class="d-flex align-items-center justify-content-between mb-3">
-                <h5 class="mb-0">Posts</h5>
-              </div>
+            <div class="py-4 px-4 mb-0">
+              <Tabs
+                defaultActiveKey="posts"
+                id="uncontrolled-tab-example"
+                className="mb-3"
+              >
+                <Tab eventKey="posts" title="Posts">
+                  <div data-aos="fade-up" data-aos-duration="300">
+                    <PostCard data={data} />
+                  </div>
+                  <div data-aos="fade-up" data-aos-duration="300">
+                    <PostCard data={data} />
+                  </div>
+                </Tab>
+                <Tab eventKey="friends" title="Friends">
+                  <div className="row">
+                    <div className="col- p-3" role="button">
+                      <FriendsCard />
+                    </div>
+                    <div className="col- p-3" role="button">
+                      <FriendsCard />
+                    </div>
+                    <div className="col- p-3" role="button">
+                      <FriendsCard />
+                    </div>
+                    <div className="col- p-3" role="button">
+                      <FriendsCard />
+                    </div>
+                    <div className="col- p-3" role="button">
+                      <FriendsCard />
+                    </div>
+                  </div>
+                </Tab>
+              </Tabs>
             </div>
           </div>
         </div>
       </div>
-    </div>
+      <EditProfileModal openModal={isOpen} HideModal={closeModal} user={user} />
+    </>
   );
 }
 

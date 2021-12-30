@@ -7,3 +7,18 @@
   background-size: cover;
   background-repeat: no-repeat;
 }
+.nav-tabs .nav-item.show .nav-link,
+.nav-tabs {
+  font-size: 18px;
+  font-family: "Josefin Sans", sans-serif;
+}
+
+.text-font-family {
+  font-family: "Josefin Sans", sans-serif;
+}
+
+.main-profile-pic {
+  height: 140px;
+  width: 130px;
+  object-fit: cover;
+}

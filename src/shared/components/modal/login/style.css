@@ -22,35 +22,7 @@
   font-size: 14px;
   margin-top: 30px;
 }
-.login-container {
-  display: flex;
-  flex-direction: column;
-  padding: 10px 0px 0px 0px;
-}
 
-.rowdirection {
-  display: flex;
-  flex: 1;
-  flex-direction: row;
-  padding-top: 20px;
-}
-.input-holder {
-  color: gray !important;
-  width: 100%;
-  flex: 2;
-  padding: 5px;
-}
-.input-text {
-  margin: 0;
-  align-self: center;
-  flex: 1;
-}
-
-.login-link {
-  margin-top: 15px;
-  font-size: 12px;
-  cursor: pointer;
-}
 button.close.custom-modal-close {
   position: absolute;
   right: 15px;

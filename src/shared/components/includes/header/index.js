@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { resetUser } from "../../../redux/reducers/userSlice";
+import avatarBaseUrl from "../../../utilities/avatarBaseUrl";
 import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 import LoginModal from "../../modal/login";
@@ -37,8 +37,6 @@ export default function Header() {
       ],
     });
   };
-
-  const [address, setAddress] = useState("");
   const [isOpen, setOpen] = useState(false);
   const [isOpen1, setOpen1] = useState(false);
   const openModal = () => setOpen(true);
@@ -65,26 +63,44 @@ export default function Header() {
             <div className="cus-navigation">
               <nav>
                 <ul>
+                  <li>
+                    <Link to="/" className="text-font-family">
+                      Home
+                    </Link>
+                  </li>
                   {user?.isLoggedIn && (
                     <>
                       <li>
-                        <Link to="/CreatePost">Create Post</Link>
+                        <Link to="/CreatePost" className="text-font-family">
+                          Create Post
+                        </Link>
                       </li>
                     </>
                   )}
-                  <li>
-                    <Link to="/">Home</Link>
+                  <li role="button">
+                    <Link to="/search">
+                      <img
+                        src={
+                          require("../../../../assets/icons/search.svg").default
+                        }
+                      />
+                    </Link>
                   </li>
                 </ul>
               </nav>
               {!user?.isLoggedIn && (
                 <div className="header-btn">
-                  <a className="custom-site-btn" onClick={openModal1}>
+                  <a
+                    className="custom-site-btn text-font-family"
+                    onClick={openModal1}
+                    role="button"
+                  >
                     Create Account
                   </a>
                   <a
-                    className="custom-site-btn custom-site-btn2"
+                    className="custom-site-btn custom-site-btn2 text-font-family"
                     onClick={openModal}
+                    role="button"
                   >
                     Login
                   </a>
@@ -92,17 +108,20 @@ export default function Header() {
               )}
 
               {user?.isLoggedIn && (
-                <Link to="/Profile">
+                <Link
+                  to={`/Profile/${user.user.id}`}
+                  style={{ textDecoration: "none", color: "black" }}
+                >
                   <div className="profile-ctn">
                     <img
                       src={
-                        user?.user?.profilePic
-                          ? user?.user?.profilePic + "?" + new Date().getTime()
+                        user?.user?.avatar
+                          ? `${avatarBaseUrl}${user.user.avatar}`
                           : ProfilePlaceHolder
                       }
                       className="profile-pic"
                     />
-                    <p className="profile-amount">{name}</p>
+                    <p className="profile-amount text-font-family">{name}</p>
                   </div>
                 </Link>
               )}
@@ -110,7 +129,7 @@ export default function Header() {
               {user?.isLoggedIn && (
                 <button
                   onClick={signOutPressHandler}
-                  className="custom-site-btn3"
+                  className="custom-site-btn3 text-font-family"
                 >
                   Sign Out
                 </button>
@@ -130,13 +149,8 @@ export default function Header() {
         openModal={isOpen}
         HideModal={closeModal}
         OpenModal1={openModal1}
-        setAddress={setAddress}
       />
-      <SignupModal
-        openModal={isOpen1}
-        HideModal={closeModal1}
-        address={address}
-      />
+      <SignupModal openModal={isOpen1} HideModal={closeModal1} />
     </div>
   );
 }

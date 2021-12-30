@@ -49,10 +49,17 @@ function PostCard({ data }) {
               </Carousel>
             </>
           ) : null}
-          <Card.Link href="#" className="btn btn-sm btn-danger">
-            Like
-          </Card.Link>
-          <Card.Link href="#">34 Comments</Card.Link>
+          <div className="d-flex flex-row align-items-center">
+            <Card.Link href="#" className="btn btn-sm btn-danger m-0 pt-2">
+              Like
+            </Card.Link>
+            <Card.Link className="ml-1" role="none">
+              12 Likes
+            </Card.Link>
+            <Card.Link role="button" className="ml-1">
+              34 Comments
+            </Card.Link>
+          </div>
         </Card.Body>
       </Card>
     </div>

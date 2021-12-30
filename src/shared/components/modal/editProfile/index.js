@@ -1,42 +1,80 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, Spinner, Row, Col } from "react-bootstrap";
-import axios from "axios";
 import Form from "react-bootstrap/Form";
+import axios from "axios";
+import { setUser } from "../../../redux/reducers/userSlice";
+import { useDispatch } from "react-redux";
 import { toastMessage } from "../../../components/common/toast";
-import "./style.css";
 import "react-toastify/dist/ReactToastify.css";
 import "react-datepicker/dist/react-datepicker.css";
 
-function SignupModal({ openModal, HideModal }) {
+function EditProfileModal({ openModal, HideModal, user }) {
   const [isSubmitting, setSubmitting] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [firstname, setFirstname] = useState("");
-  const [lastname, setLastname] = useState("");
-  const [dob, setDOB] = useState(new Date());
+  const dispatch = useDispatch();
+  const [email, setEmail] = useState(user.user.email);
+  const [bio, setBio] = useState(user.user.bio);
+  const [firstname, setFirstname] = useState(user.user.firstname);
+  const [lastname, setLastname] = useState(user.user.lastname);
+  const [dob, setDOB] = useState("2019-09-12");
+  const [image, setImage] = useState(null);
+
+  const formatDate = () => {
+    let unformatedDate = user.user.dob;
+    let day = "";
+    let month = "";
+    let year = "";
+    for (let i = 0; i < 4; i++) {
+      year = year + unformatedDate[i];
+    }
+    for (let i = 5; i < 7; i++) {
+      month = month + unformatedDate[i];
+    }
+    for (let i = 8; i < 10; i++) {
+      day = day + unformatedDate[i];
+    }
+    let formatedDate = year + "-" + month + "-" + day;
+    setDOB(formatedDate);
+  };
+
+  useEffect(() => {
+    formatDate();
+  }, []);
 
   const handleSubmit = async () => {
     setSubmitting(true);
-    const data = {
-      email: email,
-      password: password,
-      firstname: firstname,
-      lastname: lastname,
-      dob: dob,
-    };
+    let formData = new FormData();
+    if (image != null) {
+      formData.append("avatar", image);
+    }
+    formData.append("email", email);
+    formData.append("firstname", firstname);
+    formData.append("lastname", lastname);
+    formData.append("dob", dob);
+    formData.append("bio", bio);
+
     axios
-      .post("users/signup", data)
+      .put("users/edit", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
       .then((res) => {
         if (res.statusText === "OK") {
           setSubmitting(false);
+          console.log(res.data);
+          let obj = {
+            ...user,
+            user: res.data,
+          };
+          dispatch(setUser(obj));
           HideModal();
-          toastMessage("User Registered Successfully", "success");
+          toastMessage("User Updated Successfully", "success");
         }
       })
       .catch((error) => {
         console.log(error);
         setSubmitting(false);
-        toastMessage("Incorrect Data", "error");
+        toastMessage("Error Updating", "error");
       });
   };
   const CloseModal = () => {
@@ -59,7 +97,7 @@ function SignupModal({ openModal, HideModal }) {
       </button>
       <div className="modal-body modal-body-flex">
         <div className="signup-login-form">
-          <p className="signup-heading">Create your Account</p>
+          <p className="signup-heading">Edit Profile</p>
           <Form>
             <Row>
               <Col>
@@ -90,22 +128,37 @@ function SignupModal({ openModal, HideModal }) {
               </Col>
               <Col>
                 <Form.Control
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="DOB"
+                  type="date"
+                  value={dob}
+                  onChange={(e) => setDOB(e.target.value)}
                   className="text-font-family"
                 />
               </Col>
             </Row>
             <Row className="pt-3">
-              <Col className="dobStyle">
+              <Col>
                 <Form.Control
-                  placeholder="DOB"
-                  type="date"
-                  onChange={(e) => setDOB(e.target.value)}
+                  as="textarea"
+                  rows={3}
+                  placeholder="bio"
                   className="text-font-family"
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
                 />
               </Col>
+            </Row>
+            <Row className="pt-3">
+              <Col>
+                <input
+                  role="button"
+                  type="file"
+                  onChange={(e) => {
+                    setImage(e.target.files[0]);
+                  }}
+                />
+              </Col>
+              <Col></Col>
             </Row>
           </Form>
           <button type="submit" className="signup-button mt-3">
@@ -113,7 +166,7 @@ function SignupModal({ openModal, HideModal }) {
               <Spinner animation="grow" size="sm" />
             ) : (
               <p className="m-0 pt-1 text-font-family" onClick={handleSubmit}>
-                Sign up
+                Update
               </p>
             )}
           </button>
@@ -123,4 +176,4 @@ function SignupModal({ openModal, HideModal }) {
   );
 }
 
-export default SignupModal;
+export default EditProfileModal;
