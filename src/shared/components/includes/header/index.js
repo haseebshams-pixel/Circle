@@ -50,7 +50,12 @@ export default function Header() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.root.user);
   const name = user.user.firstname;
-  console.log("Header", user);
+
+  const navigate = (id) => {
+    console.log(user.user.id);
+    history.push(`/Profile/${id}`);
+    window.location.reload();
+  };
   return (
     <div>
       <header>
@@ -109,10 +114,7 @@ export default function Header() {
               )}
 
               {user?.isLoggedIn && (
-                <Link
-                  to={`/Profile/${user.user.id}`}
-                  style={{ textDecoration: "none", color: "black" }}
-                >
+                <Link onClick={() => navigate(user.user.id)}>
                   <div className="profile-ctn">
                     <img
                       src={
@@ -146,11 +148,7 @@ export default function Header() {
       </header>
       <div className="empty-header"></div>
       <SideNav offCanvas={offCanvas} closeSideNav={closeSideNav} user={user} />
-      <LoginModal
-        openModal={isOpen}
-        HideModal={closeModal}
-        OpenModal1={openModal1}
-      />
+      <LoginModal openModal={isOpen} HideModal={closeModal} />
       <SignupModal openModal={isOpen1} HideModal={closeModal1} />
     </div>
   );

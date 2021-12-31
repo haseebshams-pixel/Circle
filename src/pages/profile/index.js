@@ -3,26 +3,28 @@ import { useSelector } from "react-redux";
 import Tabs from "react-bootstrap/Tabs";
 import Tab from "react-bootstrap/Tab";
 import axios from "axios";
-import { setUser } from "../../shared/redux/reducers/userSlice";
-import { useDispatch } from "react-redux";
-import { Spinner } from "react-bootstrap";
+import { Spinner, Button } from "react-bootstrap";
+import { useHistory } from "react-router-dom";
 import "./style.css";
-import { ProfilePlaceHolder, Pic1, Pic2, Pic3 } from "../../assets";
+import { ProfilePlaceHolder } from "../../assets";
 import PostCard from "../../shared/components/common/postCard";
 import FriendsCard from "../../shared/components/common/friendsCard";
 import EditProfileModal from "../../shared/components/modal/editProfile";
 import avatarBaseUrl from "../../shared/utilities/avatarBaseUrl";
 
 function Profile(props) {
-  const dispatch = useDispatch();
+  const history = useHistory();
   const user = useSelector((state) => state.root.user);
+  const [friendStatus, setFriendStatus] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
   const [isOpen, setOpen] = useState(false);
   const openModal = () => setOpen(true);
   const closeModal = () => setOpen(false);
-  const name = user.user.firstname + " " + user.user.lastname;
   const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [friends, setFriends] = useState([]);
+  const [loading, setLoading] = useState(false);
   const getPost = () => {
+    setLoading(true);
     axios
       .get(`posts/user/${props.match.params.id}`)
       .then((res) => {
@@ -35,22 +37,73 @@ function Profile(props) {
         console.log(error);
       });
   };
+  const getFriendShipStatus = () => {
+    axios
+      .get(`friends/check/${props.match.params.id}`, {
+        headers: {
+          "x-auth-token": user.token,
+        },
+      })
+      .then((res) => {
+        if (res.statusText === "OK") {
+          setFriendStatus(true);
+        } else {
+          setFriendStatus(false);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  const getFriends = () => {
+    setLoading(true);
+    axios
+      .get(`friends/user/${props.match.params.id}`)
+      .then((res) => {
+        if (res.statusText === "OK") {
+          setFriends(res.data);
+          setLoading(false);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  const navigate = (id) => {
+    history.push(`/Profile/${id}`);
+    window.location.reload();
+  };
+  const unfriend = () => {
+    axios
+      .get(`friends/remove/${props.match.params.id}`, {
+        headers: {
+          "x-auth-token": user.token,
+        },
+      })
+      .then((res) => {
+        if (res.statusText === "OK") {
+          setFriendStatus(false);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   useEffect(() => {
     axios
       .get(`users/${props.match.params.id}`)
       .then((res) => {
         if (res.statusText === "OK") {
-          let obj = {
-            ...user,
-          };
-          obj.user = user.user;
-          dispatch(setUser(obj));
+          console.log(res.data);
+          setCurrentUser(res.data);
         }
       })
       .catch((error) => {
         console.log(error);
       });
     getPost();
+    getFriends();
+    getFriendShipStatus();
   }, []);
 
   return (
@@ -63,24 +116,49 @@ function Profile(props) {
                 <div class="profile mr-3">
                   <img
                     src={
-                      user?.user?.avatar
-                        ? `${avatarBaseUrl}${user.user.avatar}`
+                      currentUser?.id === user.user.id
+                        ? user?.user?.avatar
+                          ? `${avatarBaseUrl}${user?.user?.avatar}`
+                          : ProfilePlaceHolder
+                        : currentUser?.avatar
+                        ? `${avatarBaseUrl}${currentUser.avatar}`
                         : ProfilePlaceHolder
                     }
                     alt="profilePic"
                     width="130"
                     class="rounded mb-2 img-thumbnail main-profile-pic"
                   />
-                  <a
-                    role="button"
-                    class="btn btn-outline-dark btn-sm btn-block text-font-family"
-                    onClick={openModal}
-                  >
-                    Edit profile
-                  </a>
+                  {user?.user?.id === props.match.params.id ? (
+                    <a
+                      role="button"
+                      class="btn btn-outline-dark btn-sm btn-block text-font-family"
+                      onClick={openModal}
+                    >
+                      Edit profile
+                    </a>
+                  ) : friendStatus ? (
+                    <a
+                      role="button"
+                      class="btn btn-outline-danger btn-sm btn-block text-font-family"
+                      onClick={() => unfriend()}
+                    >
+                      Unfriend
+                    </a>
+                  ) : (
+                    <a
+                      role="button"
+                      class="btn btn-outline-primary btn-sm btn-block text-font-family"
+                    >
+                      Add Friend
+                    </a>
+                  )}
                 </div>
                 <div class="media-body mb-5 text-white">
-                  <h4 class="mt-0 mb-4 text-font-family">{name}</h4>
+                  <h4 class="mt-0 mb-4 text-font-family">
+                    {user?.user?.id === currentUser?.id
+                      ? user?.user?.firstname + " " + user?.user?.lastname
+                      : currentUser?.firstname + " " + currentUser?.lastname}
+                  </h4>
                 </div>
               </div>
             </div>
@@ -88,7 +166,7 @@ function Profile(props) {
               <ul class="list-inline mb-0">
                 <li class="list-inline-item">
                   <h5 class="font-weight-bold mb-0 d-block text-font-family">
-                    215
+                    {friends.length}
                   </h5>
                   <small class="text-muted">
                     {" "}
@@ -100,7 +178,11 @@ function Profile(props) {
             <div class="px-4 py-3">
               <h5 class="mb-0 text-font-family">Bio</h5>
               <div class="p-4 rounded shadow-sm bg-light">
-                <p class="font-italic mb-0 text-font-family">{user.user.bio}</p>
+                <p class="font-italic mb-0 text-font-family">
+                  {user?.user?.id === currentUser?.id
+                    ? user?.user?.bio
+                    : currentUser?.bio}
+                </p>
               </div>
             </div>
             <div class="py-4 px-4 mb-0">
@@ -130,21 +212,24 @@ function Profile(props) {
                 </Tab>
                 <Tab eventKey="friends" title="Friends">
                   <div className="row">
-                    <div className="col- p-3" role="button">
-                      <FriendsCard />
-                    </div>
-                    <div className="col- p-3" role="button">
-                      <FriendsCard />
-                    </div>
-                    <div className="col- p-3" role="button">
-                      <FriendsCard />
-                    </div>
-                    <div className="col- p-3" role="button">
-                      <FriendsCard />
-                    </div>
-                    <div className="col- p-3" role="button">
-                      <FriendsCard />
-                    </div>
+                    {loading ? (
+                      <div className="d-flex justify-content-center">
+                        <Spinner animation="grow" size="xl" />
+                      </div>
+                    ) : (
+                      friends.map((item, key) => {
+                        return (
+                          <div
+                            className="col- p-3"
+                            role="button"
+                            key={key}
+                            onClick={() => navigate(item)}
+                          >
+                            <FriendsCard id={item} userId={user.user.id} />
+                          </div>
+                        );
+                      })
+                    )}
                   </div>
                 </Tab>
               </Tabs>

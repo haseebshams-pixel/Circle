@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
 import Card from "react-bootstrap/Card";
-import Button from "react-bootstrap/Button";
 import axios from "axios";
-import avatarBaseUrl from "../../../utilities/avatarBaseUrl";
 import { ProfilePlaceHolder } from "../../../../assets";
-import "./style.css";
+import avatarBaseUrl from "../../../utilities/avatarBaseUrl";
 
-function FriendsCard(props) {
+function UserCard(props) {
   const [user, setUser] = useState([]);
+  console.log(props.id);
   const getUser = () => {
     axios
       .get(`users/${props.id}`)
@@ -22,13 +20,12 @@ function FriendsCard(props) {
         console.log(error);
       });
   };
-
   useEffect(() => {
     getUser();
   }, []);
   return (
     <div data-aos="fade-up" data-aos-duration="300">
-      <Card style={{ width: "19.5rem" }}>
+      <Card style={{ width: "19.5rem" }} role="button">
         <div class="profile px-3 pt-3">
           <img
             src={
@@ -52,4 +49,4 @@ function FriendsCard(props) {
   );
 }
 
-export default FriendsCard;
+export default UserCard;
