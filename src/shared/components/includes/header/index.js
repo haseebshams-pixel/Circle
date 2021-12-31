@@ -29,6 +29,7 @@ export default function Header() {
           onClick: () => {
             history.push("/");
             dispatch(resetUser());
+            localStorage.removeItem("token");
           },
         },
         {
@@ -49,7 +50,7 @@ export default function Header() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.root.user);
   const name = user.user.firstname;
-  console.log(user);
+  console.log("Header", user);
   return (
     <div>
       <header>

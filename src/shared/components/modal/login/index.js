@@ -5,6 +5,7 @@ import { setUser } from "../../../redux/reducers/userSlice";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import Form from "react-bootstrap/Form";
+import { GoogleLogin } from "react-google-login";
 
 import "./style.css";
 import "react-toastify/dist/ReactToastify.css";
@@ -17,6 +18,9 @@ function LoginModal({ openModal, HideModal }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const responseGoogle = (response) => {
+    console.log(response.token);
+  };
   const handleSubmit = async () => {
     setSubmitting(true);
     const data = {
@@ -28,7 +32,7 @@ function LoginModal({ openModal, HideModal }) {
       .then((res) => {
         if (res.statusText === "OK") {
           localStorage.setItem("token", res.data.token);
-          console.log(res.data.user);
+          console.log("data", res.data.user);
           let resp = {
             isLoggedIn: true,
             token: res.data.token,
@@ -70,7 +74,6 @@ function LoginModal({ openModal, HideModal }) {
             <Form.Control
               type="email"
               placeholder="Enter email"
-              value={email}
               className="text-font-family"
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -84,7 +87,6 @@ function LoginModal({ openModal, HideModal }) {
             <Form.Control
               type="password"
               placeholder="Password"
-              password={password}
               className="text-font-family"
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -101,6 +103,14 @@ function LoginModal({ openModal, HideModal }) {
             <p className="mb-0">Lets Go</p>
           )}
         </button>
+        <div className="mt-3" />
+        <GoogleLogin
+          clientId="25061590946-bang7h32caih37tkvj1cr6nu10oijk1b.apps.googleusercontent.com"
+          buttonText="Login with Google"
+          onSuccess={responseGoogle}
+          onFailure={responseGoogle}
+          cookiePolicy={"single_host_origin"}
+        />
       </div>
     </Modal>
   );

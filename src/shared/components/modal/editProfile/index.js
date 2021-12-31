@@ -42,6 +42,7 @@ function EditProfileModal({ openModal, HideModal, user }) {
 
   const handleSubmit = async () => {
     setSubmitting(true);
+
     let formData = new FormData();
     if (image != null) {
       formData.append("avatar", image);
@@ -56,6 +57,7 @@ function EditProfileModal({ openModal, HideModal, user }) {
       .put("users/edit", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
+          "x-auth-token": user.token,
         },
       })
       .then((res) => {

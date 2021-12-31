@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Card from "react-bootstrap/Card";
 import Carousel from "react-bootstrap/Carousel";
+import photosBaseUrl from "../../../utilities/photosBaseUrl";
 
 import "./style.css";
 
@@ -23,6 +24,7 @@ function PostCard({ data }) {
   useEffect(() => {
     getUser();
   }, []);
+  console.log(data);
   return (
     <div className="card-container">
       <Card className="card-main-container">
@@ -32,7 +34,7 @@ function PostCard({ data }) {
           </Card.Title>
           <Card.Subtitle className="mb-2 text-muted">{data.date}</Card.Subtitle>
           <Card.Text>{data.text}</Card.Text>
-          {data.images != null ? (
+          {data.images.length != 0 ? (
             <>
               <Carousel className="carosal">
                 {data.images.map((item, index) => {
@@ -40,7 +42,7 @@ function PostCard({ data }) {
                     <Carousel.Item key={index}>
                       <img
                         className="carosal-image"
-                        src={item.imageURL}
+                        src={`${photosBaseUrl}${item}`}
                         alt="First slide"
                       />
                     </Carousel.Item>
@@ -50,7 +52,7 @@ function PostCard({ data }) {
             </>
           ) : null}
           <div className="d-flex flex-row align-items-center">
-            <Card.Link href="#" className="btn btn-sm btn-danger m-0 pt-2">
+            <Card.Link href="#" className="btn btn-sm btn-danger m-0">
               Like
             </Card.Link>
             <Card.Link className="ml-1" role="none">

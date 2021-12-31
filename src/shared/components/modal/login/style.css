@@ -14,11 +14,11 @@
 }
 
 .connect-login-btn {
-  min-width: 150px;
+  min-width: 170px;
   height: 40px;
   border: none;
   background-color: #0c8ed3;
-  color: #e8e8e8;
+  color: white;
   font-size: 14px;
   margin-top: 30px;
 }

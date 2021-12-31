@@ -65,7 +65,6 @@ function SignupModal({ openModal, HideModal }) {
               <Col>
                 <Form.Control
                   placeholder="First name"
-                  value={firstname}
                   onChange={(e) => setFirstname(e.target.value)}
                   className="text-font-family"
                 />
@@ -73,7 +72,6 @@ function SignupModal({ openModal, HideModal }) {
               <Col>
                 <Form.Control
                   placeholder="Last name"
-                  value={lastname}
                   onChange={(e) => setLastname(e.target.value)}
                   className="text-font-family"
                 />
@@ -83,7 +81,6 @@ function SignupModal({ openModal, HideModal }) {
               <Col>
                 <Form.Control
                   placeholder="Email"
-                  value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="text-font-family"
                 />
@@ -91,7 +88,6 @@ function SignupModal({ openModal, HideModal }) {
               <Col>
                 <Form.Control
                   placeholder="Password"
-                  value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="text-font-family"
                 />
