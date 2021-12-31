@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faBell } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { resetUser } from "../../../redux/reducers/userSlice";
 import avatarBaseUrl from "../../../utilities/avatarBaseUrl";
+import axios from "axios";
 import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 import LoginModal from "../../modal/login";
@@ -15,6 +16,7 @@ import { useHistory } from "react-router-dom";
 import { ProfilePlaceHolder } from "../../../../assets";
 
 import "./style.css";
+import Request from "../../modal/requests";
 
 export default function Header() {
   const history = useHistory();
@@ -40,10 +42,13 @@ export default function Header() {
   };
   const [isOpen, setOpen] = useState(false);
   const [isOpen1, setOpen1] = useState(false);
+  const [isOpen2, setOpen2] = useState(false);
   const openModal = () => setOpen(true);
   const closeModal = () => setOpen(false);
   const openModal1 = () => setOpen1(true);
   const closeModal1 = () => setOpen1(false);
+  const openModal2 = () => setOpen2(true);
+  const closeModal2 = () => setOpen2(false);
   const openSideNav = () => setOffCanvas(true);
   const closeSideNav = () => setOffCanvas(false);
 
@@ -56,6 +61,7 @@ export default function Header() {
     history.push(`/Profile/${id}`);
     window.location.reload();
   };
+
   return (
     <div>
       <header>
@@ -92,6 +98,13 @@ export default function Header() {
                       />
                     </Link>
                   </li>
+                  {user?.isLoggedIn && (
+                    <>
+                      <li role="button" className="mr-3" onClick={openModal2}>
+                        <FontAwesomeIcon icon={faBell} />
+                      </li>
+                    </>
+                  )}
                 </ul>
               </nav>
               {!user?.isLoggedIn && (
@@ -150,6 +163,7 @@ export default function Header() {
       <SideNav offCanvas={offCanvas} closeSideNav={closeSideNav} user={user} />
       <LoginModal openModal={isOpen} HideModal={closeModal} />
       <SignupModal openModal={isOpen1} HideModal={closeModal1} />
+      <Request openModal={isOpen2} HideModal={closeModal2} />
     </div>
   );
 }

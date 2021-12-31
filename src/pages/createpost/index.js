@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Spinner, Row, Col, Button } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import axios from "axios";
+import { useSelector } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { toastMessage } from "../../shared/components/common/toast";
@@ -10,6 +11,7 @@ function CreatePost() {
   const [isSubmitting, setSubmitting] = useState(false);
   const [text, setText] = useState("");
   const [photos, setPhotos] = useState(null);
+  const user = useSelector((state) => state.root.user);
   const handleSubmit = async () => {
     setSubmitting(true);
     let formData = new FormData();
@@ -29,11 +31,13 @@ function CreatePost() {
         .post("posts/", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
+            "x-auth-token": user.token,
           },
         })
         .then((res) => {
           if (res.statusText === "OK") {
             setSubmitting(false);
+            setText("");
             toastMessage("Posted Successfully", "success");
           }
         })
@@ -46,11 +50,6 @@ function CreatePost() {
   };
   const changePhotos = (e) => {
     console.log(e.target.files);
-    // let obj = [];
-    // for (let i = 0; i < e.target.files.length; i++) {
-    //   obj.push(e.target.files[i]);
-    // }
-    //console.log(obj);
     setPhotos(e.target.files);
   };
   return (
@@ -62,6 +61,7 @@ function CreatePost() {
             <Form.Control
               as="textarea"
               rows={5}
+              value={text}
               placeholder="whats new?"
               className="text-font-family"
               size="lg"

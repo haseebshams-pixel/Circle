@@ -22,3 +22,7 @@
   width: 130px;
   object-fit: cover;
 }
+.disabled {
+  pointer-events: none;
+  cursor: default;
+}

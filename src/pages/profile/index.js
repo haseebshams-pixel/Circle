@@ -11,11 +11,15 @@ import PostCard from "../../shared/components/common/postCard";
 import FriendsCard from "../../shared/components/common/friendsCard";
 import EditProfileModal from "../../shared/components/modal/editProfile";
 import avatarBaseUrl from "../../shared/utilities/avatarBaseUrl";
+import { toastMessage } from "../../shared/components/common/toast";
 
 function Profile(props) {
   const history = useHistory();
   const user = useSelector((state) => state.root.user);
-  const [friendStatus, setFriendStatus] = useState(false);
+  const [friendStatus, setFriendStatus] = useState("");
+  const [requested, setRequested] = useState(false);
+  const [pending, setPending] = useState(false);
+  const [friend, setFriend] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [isOpen, setOpen] = useState(false);
   const openModal = () => setOpen(true);
@@ -46,9 +50,24 @@ function Profile(props) {
       })
       .then((res) => {
         if (res.statusText === "OK") {
-          setFriendStatus(true);
-        } else {
-          setFriendStatus(false);
+          setFriendStatus(res.data.state);
+          if (res.data.state === "friend") {
+            setFriend(true);
+            setRequested(false);
+            setPending(false);
+          } else if (res.data.state === "notfriend") {
+            setFriend(false);
+            setRequested(false);
+            setPending(false);
+          } else if (res.data.state === "requested") {
+            setRequested(true);
+            setFriend(false);
+            setPending(false);
+          } else if (res.data.state === "pending") {
+            setPending(false);
+            setFriend(false);
+            setPending(true);
+          }
         }
       })
       .catch((error) => {
@@ -82,7 +101,46 @@ function Profile(props) {
       })
       .then((res) => {
         if (res.statusText === "OK") {
-          setFriendStatus(false);
+          setRequested(false);
+          setFriend(false);
+          setPending(false);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  const sendRequest = () => {
+    axios
+      .get(`friends/request/${props.match.params.id}`, {
+        headers: {
+          "x-auth-token": user.token,
+        },
+      })
+      .then((res) => {
+        if (res.statusText === "OK") {
+          toastMessage("Request Sent", "success");
+          setRequested(true);
+          setFriend(false);
+          setPending(false);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  const acceptRequest = () => {
+    axios
+      .get(`friends/confirm/${props.match.params.id}`, {
+        headers: {
+          "x-auth-token": user.token,
+        },
+      })
+      .then((res) => {
+        if (res.statusText === "OK") {
+          setRequested(false);
+          setFriend(true);
+          setPending(false);
         }
       })
       .catch((error) => {
@@ -109,11 +167,11 @@ function Profile(props) {
   return (
     <>
       <div className="container" data-aos="fade-up" data-aos-duration="500">
-        <div class="py-5 px-4">
-          <div class="bg-white rounded overflow-hidden">
-            <div class="px-4 pt-0 pb-4 cover">
-              <div class="media align-items-end profile-head">
-                <div class="profile mr-3">
+        <div className="py-5 px-4">
+          <div className="bg-white rounded overflow-hidden">
+            <div className="px-4 pt-0 pb-4 cover">
+              <div className="media align-items-end profile-head">
+                <div className="profile mr-3">
                   <img
                     src={
                       currentUser?.id === user.user.id
@@ -126,35 +184,51 @@ function Profile(props) {
                     }
                     alt="profilePic"
                     width="130"
-                    class="rounded mb-2 img-thumbnail main-profile-pic"
+                    className="rounded mb-2 img-thumbnail main-profile-pic"
                   />
                   {user?.user?.id === props.match.params.id ? (
                     <a
                       role="button"
-                      class="btn btn-outline-dark btn-sm btn-block text-font-family"
+                      className="btn btn-outline-dark btn-sm btn-block text-font-family"
                       onClick={openModal}
                     >
                       Edit profile
                     </a>
-                  ) : friendStatus ? (
+                  ) : friend ? (
                     <a
                       role="button"
-                      class="btn btn-outline-danger btn-sm btn-block text-font-family"
+                      className="btn btn-outline-danger btn-sm btn-block text-font-family"
                       onClick={() => unfriend()}
                     >
                       Unfriend
                     </a>
+                  ) : requested ? (
+                    <a
+                      role="button"
+                      className="btn btn-outline-primary btn-sm btn-block text-font-family disabled"
+                    >
+                      Requested
+                    </a>
+                  ) : pending ? (
+                    <a
+                      role="button"
+                      className="btn btn-outline-success btn-sm btn-block text-font-family"
+                      onClick={() => acceptRequest()}
+                    >
+                      Accept
+                    </a>
                   ) : (
                     <a
                       role="button"
-                      class="btn btn-outline-primary btn-sm btn-block text-font-family"
+                      className="btn btn-outline-primary btn-sm btn-block text-font-family"
+                      onClick={() => sendRequest()}
                     >
                       Add Friend
                     </a>
                   )}
                 </div>
-                <div class="media-body mb-5 text-white">
-                  <h4 class="mt-0 mb-4 text-font-family">
+                <div className="media-body mb-5 text-white">
+                  <h4 className="mt-0 mb-4 text-font-family">
                     {user?.user?.id === currentUser?.id
                       ? user?.user?.firstname + " " + user?.user?.lastname
                       : currentUser?.firstname + " " + currentUser?.lastname}
@@ -162,30 +236,31 @@ function Profile(props) {
                 </div>
               </div>
             </div>
-            <div class="bg-light p-4 d-flex justify-content-end text-center">
-              <ul class="list-inline mb-0">
-                <li class="list-inline-item">
-                  <h5 class="font-weight-bold mb-0 d-block text-font-family">
+            <div className="bg-light p-4 d-flex justify-content-end text-center">
+              <ul className="list-inline mb-0">
+                <li className="list-inline-item">
+                  <h5 className="font-weight-bold mb-0 d-block text-font-family">
                     {friends.length}
                   </h5>
-                  <small class="text-muted">
+                  <small className="text-muted">
                     {" "}
-                    <i class="fas fa-image mr-1 text-font-family"></i>Friends
+                    <i className="fas fa-image mr-1 text-font-family"></i>
+                    Friends
                   </small>
                 </li>
               </ul>
             </div>
-            <div class="px-4 py-3">
-              <h5 class="mb-0 text-font-family">Bio</h5>
-              <div class="p-4 rounded shadow-sm bg-light">
-                <p class="font-italic mb-0 text-font-family">
+            <div className="px-4 py-3">
+              <h5 className="mb-0 text-font-family">Bio</h5>
+              <div className="p-4 rounded shadow-sm bg-light">
+                <p className="font-italic mb-0 text-font-family">
                   {user?.user?.id === currentUser?.id
                     ? user?.user?.bio
                     : currentUser?.bio}
                 </p>
               </div>
             </div>
-            <div class="py-4 px-4 mb-0">
+            <div className="py-4 px-4 mb-0">
               <Tabs
                 defaultActiveKey="posts"
                 id="uncontrolled-tab-example"

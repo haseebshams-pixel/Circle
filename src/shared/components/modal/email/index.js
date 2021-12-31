@@ -29,6 +29,7 @@ function Email({ openModal, HideModal }) {
           setSubmitting(false);
           HideModal();
           openModal2();
+          toastMessage(res.data, "success");
         }
       })
       .catch((error) => {

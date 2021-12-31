@@ -42,7 +42,6 @@ function LoginModal({ openModal, HideModal }) {
             user: res.data.user,
           };
           dispatch(setUser(resp));
-          console.log(res.data.user);
           history.push(`/Profile/${res.data.user.id}`);
           HideModal();
           toastMessage("User Logged In Successfully", "success");
