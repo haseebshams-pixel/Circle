@@ -5,22 +5,13 @@ import Tab from "react-bootstrap/Tab";
 import axios from "axios";
 import { setUser } from "../../shared/redux/reducers/userSlice";
 import { useDispatch } from "react-redux";
+import { Spinner } from "react-bootstrap";
 import "./style.css";
 import { ProfilePlaceHolder, Pic1, Pic2, Pic3 } from "../../assets";
 import PostCard from "../../shared/components/common/postCard";
 import FriendsCard from "../../shared/components/common/friendsCard";
 import EditProfileModal from "../../shared/components/modal/editProfile";
-import { toastMessage } from "../../shared/components/common/toast";
 import avatarBaseUrl from "../../shared/utilities/avatarBaseUrl";
-
-const data = {
-  id: "61cc4451258f3045560e54e7",
-  text: "Hello name is salman, add me !",
-  images: [{ imageURL: Pic1 }, { imageURL: Pic2 }, { imageURL: Pic3 }],
-  postedBy: "61cddf0fe7fc0a90ffdb7de5",
-  date: "2021-12-29",
-  _v: 0,
-};
 
 function Profile(props) {
   const dispatch = useDispatch();
@@ -29,6 +20,21 @@ function Profile(props) {
   const openModal = () => setOpen(true);
   const closeModal = () => setOpen(false);
   const name = user.user.firstname + " " + user.user.lastname;
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const getPost = () => {
+    axios
+      .get(`posts/user/${props.match.params.id}`)
+      .then((res) => {
+        if (res.statusText === "OK") {
+          setPosts(res.data);
+          setLoading(false);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   useEffect(() => {
     axios
       .get(`users/${props.match.params.id}`)
@@ -44,6 +50,7 @@ function Profile(props) {
       .catch((error) => {
         console.log(error);
       });
+    getPost();
   }, []);
 
   return (
@@ -103,12 +110,23 @@ function Profile(props) {
                 className="mb-3"
               >
                 <Tab eventKey="posts" title="Posts">
-                  <div data-aos="fade-up" data-aos-duration="300">
-                    <PostCard data={data} />
-                  </div>
-                  <div data-aos="fade-up" data-aos-duration="300">
-                    <PostCard data={data} />
-                  </div>
+                  {loading ? (
+                    <div className="d-flex justify-content-center">
+                      <Spinner animation="grow" size="xl" />
+                    </div>
+                  ) : (
+                    posts.map((item, key) => {
+                      return (
+                        <div
+                          data-aos="fade-up"
+                          data-aos-duration="500"
+                          key={key}
+                        >
+                          <PostCard data={item} />
+                        </div>
+                      );
+                    })
+                  )}
                 </Tab>
                 <Tab eventKey="friends" title="Friends">
                   <div className="row">

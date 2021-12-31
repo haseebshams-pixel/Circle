@@ -4,15 +4,11 @@ import { useSelector } from "react-redux";
 import Layout from "./layout";
 import { allPublicRoute, logedInRoute } from "./allRoute";
 import { Route } from "react-router-dom";
-import Loader from "../components/common/loader";
 function AuthRoute() {
   const { user, loader } = useSelector((state) => state.root);
   return (
     <div style={{ position: "relative" }}>
-      {loader?.Loader && <Loader />}
-
       <Header />
-
       {user.isLoggedIn
         ? logedInRoute.map((route, inx) => {
             return (
